@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">TodoListManager</string>
+    <string-array name="israel_cities">
+        <item>Tel-Aviv</item>
+        <item>Jerusalem</item>
+    </string-array>
+    <string name="title_activity_activity_listview">activity_listview</string>
+</resources>
