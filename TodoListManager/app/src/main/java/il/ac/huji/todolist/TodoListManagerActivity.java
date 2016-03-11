@@ -28,12 +28,9 @@ public class TodoListManagerActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        for(int i = 0; i < 20; i++) {
-            todoArray.add("test task " + Integer.toString(i));
-        }
         adapter = new MyCustomAdapter(this, R.layout.support_simple_spinner_dropdown_item, todoArray);
 
-        ListView listView = (ListView) findViewById(R.id.todo_list);
+        ListView listView = (ListView) findViewById(R.id.lstTodoItems);
         listView.setAdapter(adapter);
 
         builder = new AlertDialog.Builder(this);

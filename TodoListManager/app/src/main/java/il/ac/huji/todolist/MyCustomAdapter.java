@@ -34,7 +34,7 @@ public class MyCustomAdapter extends ArrayAdapter<String> {
             String item = getItem(position);
             view.setText(item);
         }
-        view.setTextColor(position % 2 == 0 ? Color.BLACK : Color.RED);
+        view.setTextColor(position % 2 == 0 ? Color.RED : Color.BLUE);
         return view;
     }
 

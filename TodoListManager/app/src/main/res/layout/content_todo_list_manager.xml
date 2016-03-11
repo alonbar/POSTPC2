@@ -13,7 +13,7 @@
     tools:showIn="@layout/activity_todo_list_manager">
 
     <ListView
-        android:id="@+id/todo_list"
+        android:id="@+id/lstTodoItems"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"

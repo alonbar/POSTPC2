@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="il.ac.huji.todolist.TodoListManagerActivity">
     <item
-        android:id="@+id/add"
+        android:id="@+id/menuItemAdd"
         android:orderInCategory="100"
         android:title="add"
         app:showAsAction="never"  />
