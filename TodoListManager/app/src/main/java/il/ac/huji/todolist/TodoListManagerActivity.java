@@ -1,7 +1,9 @@
 package il.ac.huji.todolist;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -10,11 +12,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class TodoListManagerActivity extends AppCompatActivity {
     ArrayList<String> todoArray =new ArrayList<String>();
@@ -30,6 +34,12 @@ public class TodoListManagerActivity extends AppCompatActivity {
 
         adapter = new MyCustomAdapter(this, R.layout.support_simple_spinner_dropdown_item, todoArray);
 
+
+        String dateStr = "16/03/2016";
+        String year = dateStr.substring(dateStr.length() - 4);
+        String monthStr = dateStr.substring(dateStr.length() - 7, dateStr.length() - 5);
+        int month  = Integer.parseInt(monthStr);
+        String dayStr = dateStr.substring(dateStr.length() - 10, dateStr.length() - 8);
         ListView listView = (ListView) findViewById(R.id.lstTodoItems);
         listView.setAdapter(adapter);
 
@@ -53,7 +63,6 @@ public class TodoListManagerActivity extends AppCompatActivity {
                 return true;
             }
         });
-
     }
 
     @Override
@@ -70,32 +79,23 @@ public class TodoListManagerActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        // Set up the input
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-
-// Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                m_Text = input.getText().toString();
-                synchronized (adapter) {
-                    todoArray.add(m_Text);
-                    adapter.notify();
-                }
-
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
+        Intent intent = new Intent(this, AddNewTodoItemActivity.class);
+        startActivityForResult(intent, 1);
         return true;
-
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                String task=data.getStringExtra("task");
+                Date date = (Date)data.getSerializableExtra("date");
+                String dateStr = Integer.toString(date.getYear()).substring(1) + "/" + Integer.toString(date.getMonth()).substring(1) + "/" + Integer.toString(date.getDay());
+                String row = task + " " + date;
+                todoArray.add(row);
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }//onActivityResult
 }
