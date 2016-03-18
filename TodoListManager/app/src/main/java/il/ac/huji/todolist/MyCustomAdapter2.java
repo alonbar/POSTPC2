@@ -42,13 +42,20 @@ public class MyCustomAdapter2 extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // TODO Auto-generated method stub
-        View vi = convertView;
-        if (vi == null)
-            vi = inflater.inflate(R.layout.row, null);
-        TextView text = (TextView) vi.findViewById(R.id.text);
-        text.setText(data[position].task);
-//        DatePicker date = (DatePicker)vi.fi
-        return vi;
+        View v = convertView;
+
+        if (v == null) {
+            LayoutInflater vi;
+                v = inflater.inflate(R.layout.row, null);
+
+            Task t = (Task)getItem(position);
+            if (t != null) {
+                TextView tt1 = (TextView)v.findViewById(R.id.txtTodoTitle);
+                TextView tt2 = (TextView)v.findViewById(R.id.txtTodoDueDate);
+                tt1.setText(t.task);
+                tt2.setText(t.date);
+            }
+        }
+        return v;
     }
 }

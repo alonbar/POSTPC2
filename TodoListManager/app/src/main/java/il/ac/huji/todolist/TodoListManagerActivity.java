@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,51 +19,45 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class TodoListManagerActivity extends AppCompatActivity {
-    ArrayList<String> todoArray =new ArrayList<String>();
+    ArrayList<Task> todoArray =new ArrayList<Task>();
     private String m_Text = "";
     AlertDialog.Builder builder;
-    MyCustomAdapter adapter;
+    MyCustomAdapter3 adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_list_manager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        adapter = new MyCustomAdapter(this, R.layout.support_simple_spinner_dropdown_item, todoArray);
-
-
-        String dateStr = "16/03/2016";
-        String year = dateStr.substring(dateStr.length() - 4);
-        String monthStr = dateStr.substring(dateStr.length() - 7, dateStr.length() - 5);
-        int month  = Integer.parseInt(monthStr);
-        String dayStr = dateStr.substring(dateStr.length() - 10, dateStr.length() - 8);
+        adapter = new MyCustomAdapter3(this, R.layout.row, todoArray);
         ListView listView = (ListView) findViewById(R.id.lstTodoItems);
         listView.setAdapter(adapter);
-
-        builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add a task");
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-            @Override
-            public boolean onItemLongClick(final AdapterView<?> parent, View view, final int position, long id) {
-
-                final AlertDialog.Builder b = new AlertDialog.Builder(TodoListManagerActivity.this);
-                b.setIcon(android.R.drawable.ic_dialog_alert);
-                b.setMessage(((TextView)view).getText().toString());
-                b.setNeutralButton("Delete " + ((TextView) view).getText().toString(), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        adapter.remove(adapter.getItem(position));
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-                b.show();
-                return true;
-            }
-        });
+        registerForContextMenu(listView);
+//        builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Add a task");
+//        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//
+//            @Override
+//            public boolean onItemLongClick(final AdapterView<?> parent, View view, final int position, long id) {
+//
+//                final AlertDialog.Builder b = new AlertDialog.Builder(TodoListManagerActivity.this);
+//                b.setIcon(android.R.drawable.ic_dialog_alert);
+//                b.setMessage(((TextView)view).getText().toString());
+//                b.setNeutralButton("Delete " + ((TextView) view).getText().toString(), new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int whichButton) {
+//                        adapter.remove(adapter.getItem(position));
+//                        adapter.notifyDataSetChanged();
+//                    }
+//                });
+//                b.show();
+//                return true;
+//            }
+//        });
     }
 
     @Override
@@ -89,13 +84,37 @@ public class TodoListManagerActivity extends AppCompatActivity {
 
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
-                String task=data.getStringExtra("task");
+                String taskStr=data.getStringExtra("task");
                 Date date = (Date)data.getSerializableExtra("date");
-                String dateStr = Integer.toString(date.getYear()).substring(1) + "/" + Integer.toString(date.getMonth()).substring(1) + "/" + Integer.toString(date.getDay());
-                String row = task + " " + date;
-                todoArray.add(row);
+                String dateStr = Integer.toString(date.getDate() + 100).substring(1) + "/" + Integer.toString(date.getMonth() + 100).substring(1) + "/" + Integer.toString(date.getYear());
+                Task task = new Task(taskStr, dateStr);
+                todoArray.add(task);
                 adapter.notifyDataSetChanged();
             }
         }
-    }//onActivityResult
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        TextView tt1 = (TextView)view.findViewById(R.id.txtTodoTitle);
+        menu.setHeaderTitle(tt1.getText().toString());
+        menu.add(0, view.getId(), 0, "Delete");//groupId, itemId, order, title
+        if (tt1.getText().toString().length() >= 4 && tt1.getText().toString().substring(0,4).equals("Call") == true)
+            menu.add(0, view.getId(), 0, tt1.getText().toString());
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        if (item.getTitle().toString().equals("Delete") ) {
+            adapter.remove(adapter.getItem(info.position));
+            adapter.notifyDataSetChanged();
+
+        }
+        else if (item.getTitle() == "Action 2") {
+            System.out.println("calling");
+        }
+        return true;
+    }
 }
