@@ -14,26 +14,47 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.Date;
 
 public class TodoListManagerActivity extends AppCompatActivity {
     ArrayList<Task> todoArray =new ArrayList<Task>();
     MyCustomAdapter3 adapter;
-
+    Firebase myFirebaseRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_list_manager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Firebase.setAndroidContext(this);
         adapter = new MyCustomAdapter3(this, R.layout.row, todoArray);
         ListView listView = (ListView) findViewById(R.id.lstTodoItems);
         listView.setAdapter(adapter);
         registerForContextMenu(listView);
-        for (int i = 0; i < 40; i++) {
-            todoArray.add(new Task(Integer.toString(i), "17/06/2016"));
-        }
+        myFirebaseRef = new Firebase("https://glaring-inferno-6020.firebaseio.com/");
+        Task task = new Task("aa", "sfd");
+
+        Firebase ref = new Firebase("https://glaring-inferno-6020.firebaseio.com/");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                System.out.println(snapshot.getValue());
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+
+        myFirebaseRef.child(Integer.toString(todoArray.size())).setValue(task);
     }
 
     @Override
@@ -65,6 +86,7 @@ public class TodoListManagerActivity extends AppCompatActivity {
                 String dateStr = Integer.toString(date.getDate() + 100).substring(1) + "/" + Integer.toString(date.getMonth() + 100).substring(1) + "/" + Integer.toString(date.getYear());
                 Task task = new Task(taskStr, dateStr);
                 todoArray.add(task);
+                myFirebaseRef.child(Integer.toString(todoArray.size())).setValue(task);
                 adapter.notifyDataSetChanged();
             }
         }
