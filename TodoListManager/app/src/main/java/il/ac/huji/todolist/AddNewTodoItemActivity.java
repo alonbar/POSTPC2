@@ -9,6 +9,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -26,6 +27,12 @@ public class AddNewTodoItemActivity extends AppCompatActivity {
             public void onClick(View v) {
                 EditText taskView = (EditText) findViewById(R.id.edtNewItem);
                 String taskStr = taskView.getText().toString();
+                if (taskStr.equals("")){
+                    Toast.makeText(getApplicationContext(), "Task field can't remain blank", Toast.LENGTH_LONG).show();
+                    setResult(Activity.RESULT_CANCELED, returnIntent);
+                    finish();
+
+                }
                 returnIntent.putExtra("task", taskStr);
                 DatePicker dateView = (DatePicker)findViewById(R.id.datePicker);
                 returnIntent.putExtra("date", new Date (dateView.getYear(), dateView.getMonth() + 1, dateView.getDayOfMonth()));

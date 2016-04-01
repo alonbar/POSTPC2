@@ -22,11 +22,13 @@ import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 public class TodoListManagerActivity extends AppCompatActivity {
     ArrayList<Task> todoArray =new ArrayList<Task>();
     MyCustomAdapter3 adapter;
     Firebase myFirebaseRef;
+    boolean onCreateFlag = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,13 +41,19 @@ public class TodoListManagerActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
         registerForContextMenu(listView);
         myFirebaseRef = new Firebase("https://glaring-inferno-6020.firebaseio.com/");
-        Task task = new Task("aa", "sfd");
 
         Firebase ref = new Firebase("https://glaring-inferno-6020.firebaseio.com/");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 System.out.println(snapshot.getValue());
+                if (onCreateFlag == true) {
+                    for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                        todoArray.add(new Task(postSnapshot.getKey(),postSnapshot.getValue(String.class)));
+                    }
+                    adapter.notifyDataSetChanged();
+                    onCreateFlag = false;
+                }
             }
 
             @Override
@@ -53,8 +61,6 @@ public class TodoListManagerActivity extends AppCompatActivity {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
-
-        myFirebaseRef.child(Integer.toString(todoArray.size())).setValue(task);
     }
 
     @Override
@@ -86,7 +92,7 @@ public class TodoListManagerActivity extends AppCompatActivity {
                 String dateStr = Integer.toString(date.getDate() + 100).substring(1) + "/" + Integer.toString(date.getMonth() + 100).substring(1) + "/" + Integer.toString(date.getYear());
                 Task task = new Task(taskStr, dateStr);
                 todoArray.add(task);
-                myFirebaseRef.child(Integer.toString(todoArray.size())).setValue(task);
+                myFirebaseRef.child(task.task).setValue(task.date);
                 adapter.notifyDataSetChanged();
             }
         }
@@ -108,6 +114,8 @@ public class TodoListManagerActivity extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         if (item.getTitle().toString().equals("Delete") ) {
+
+            myFirebaseRef.child(adapter.getItem(info.position).task).setValue(null);
             adapter.remove(adapter.getItem(info.position));
             adapter.notifyDataSetChanged();
 
